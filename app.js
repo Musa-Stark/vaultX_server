@@ -1,5 +1,7 @@
 import express from "express";
 export const app = express();
+// Trust Vercel's single edge proxy (most common & safe value for Vercel)
+app.set('trust proxy', 1);
 import cors from "cors";
 import { successResponse } from "./utils/successResponse.js";
 import authRouter from "./modules/auth/auth.route.js";
