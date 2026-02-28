@@ -22,3 +22,6 @@ app.use("/api/v1/auth", authRouter);
 app.use("/api/v1/password", passwordRouter);
 
 app.use(errorHandler);
+
+// ←←← ADD THIS LINE AT THE VERY BOTTOM
+export default app;
