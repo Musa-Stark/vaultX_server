@@ -4,7 +4,8 @@ import { User } from "../user/user.model.js";
 import { TempUser } from "../user/tempUser.model.js";
 import jwt from "jsonwebtoken";
 
-export const serviceSendOTP = async (userData) => {
+// sending OTP while registering
+export const serviceRegisterSendOTP = async (userData) => {
   await connectDB();
 
   let { name, email, password, masterPassword } = userData;
@@ -38,6 +39,7 @@ export const serviceSendOTP = async (userData) => {
   });
 };
 
+// registration
 export const serviceRegister = async (userData) => {
   await connectDB();
 
@@ -67,6 +69,58 @@ export const serviceRegister = async (userData) => {
   return { user, token };
 };
 
+// sending OTP when password forgot
+export const serviceForgotPasswordSendOTP = async (email) => {
+  await connectDB();
+
+  const user = await User.findOne({ email });
+  if (!user) throw new AppError("User with this email not found", 409);
+
+  const otp = await sendOTP(email);
+  if (otp.error)
+    throw new Error(
+      "You are not allowed to use this application",
+      otp.statusCode,
+    );
+
+  const otpHash = await hash(otp);
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  await TempUser.deleteOne({ email });
+
+  await TempUser.create({
+    email,
+    otpHash,
+    expiresAt,
+  });
+};
+
+// verfication OTP when password forgot
+export const serviceForgotPasswordVerifyOTP = async (email, otp) => {
+  await connectDB();
+
+  const { otpHash, expiresAt, attempts } = await TempUser.findOne({ email });
+
+  if (expiresAt < Date.now())
+    throw new AppError("OTP verification timed out!", 408);
+
+  const verifyOTP = await verify(otp, otpHash);
+  if (!verifyOTP) throw new AppError("Invalid OTP. Please try again", 409);
+};
+
+// updating, new password when forgot password
+export const serviceNewPassword = async (email, newPassword) => {
+  await connectDB();
+
+  const user = await User.findOne({ email });
+  if (!user) throw new AppError("User with this email not found", 409);
+
+  newPassword = await hash(newPassword);
+
+  await User.updateOne({ email: email }, { $set: { password: newPassword } });
+};
+
+// login
 export const serviceLogin = async (userData) => {
   await connectDB();
 
@@ -90,7 +144,10 @@ export const serviceLogin = async (userData) => {
   return token;
 };
 
+// vault unlock
 export const serviceUnlock = async (id, data) => {
+  await connectDB();
+
   const { masterPassword } = data;
 
   const user = await User.findById(id).select("+masterPassword");

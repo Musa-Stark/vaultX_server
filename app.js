@@ -1,7 +1,7 @@
 import express from "express";
 export const app = express();
 // Trust Vercel's single edge proxy (most common & safe value for Vercel)
-app.set('trust proxy', 1);
+app.set("trust proxy", 1);
 import cors from "cors";
 import { successResponse } from "./utils/successResponse.js";
 import authRouter from "./modules/auth/auth.route.js";
@@ -11,8 +11,8 @@ import helmet from "helmet";
 import { apiLimiter } from "./utils/limiter.js";
 
 app.use(express.json());
-app.use(cors());
 app.use(helmet());
+app.use(cors());
 
 app.use("/api/v1", apiLimiter);
 

@@ -19,7 +19,7 @@ export const sendOTP = async (email) => {
           
           <tr>
             <td align="center" style="padding-bottom:20px;">
-              <h2 style="margin:0; color:#111827; font-weight:600;">Your Company</h2>
+              <h2 style="margin:0; color:#111827; font-weight:600;">VaultX</h2>
             </td>
           </tr>
 
@@ -82,7 +82,7 @@ export const sendOTP = async (email) => {
 </html>`;
 
   const result = await resend.emails.send({
-    from: "onboarding@resend.dev",
+    from: "OTP - VaultX <onboarding@resend.dev>",
     to: email,
     subject: "Email verification",
     html: htmlTemp,

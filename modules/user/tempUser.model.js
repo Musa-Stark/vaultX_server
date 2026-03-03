@@ -2,7 +2,7 @@ import mongoose from "mongoose";
 
 const tempUserSchema = new mongoose.Schema(
   {
-    name: { type: String, required: true, trim: true },
+    name: { type: String, trim: true },
     email: {
       type: String,
       required: true,
@@ -12,11 +12,9 @@ const tempUserSchema = new mongoose.Schema(
     },
     password: {
       type: String,
-      required: true,
     },
     masterPassword: {
       type: String,
-      required: true,
     },
     otpHash: {
       type: String,

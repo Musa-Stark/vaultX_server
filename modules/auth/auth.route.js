@@ -1,7 +1,10 @@
 import express from "express";
 const router = express.Router();
 import {
-  controllerSendOTP,
+  controllerRegisterSendOTP,
+  controllerForgotPasswordSendOTP,
+  controllerForgotPasswordVerifyOTP,
+  controllerNewPassword,
   controllerRegister,
   controllerLogin,
   controllerToken,
@@ -10,8 +13,18 @@ import {
 import { asyncHandler } from "../../utils/asyncHandler.js";
 import { protect } from "../../middleware/auth.middleware.js";
 
-router.post("/sendOTP", asyncHandler(controllerSendOTP))
+// routes
+router.post("/registerSendOTP", asyncHandler(controllerRegisterSendOTP));
 router.post("/register", asyncHandler(controllerRegister));
+router.post(
+  "/forgotPasswordSendOTP",
+  asyncHandler(controllerForgotPasswordSendOTP),
+);
+router.post(
+  "/forgotPasswordVerifyOTP",
+  asyncHandler(controllerForgotPasswordVerifyOTP),
+);
+router.patch("/newPassword", asyncHandler(controllerNewPassword))
 router.post("/login", asyncHandler(controllerLogin));
 router.get("/token", protect, asyncHandler(controllerToken));
 router.post("/unlock", protect, asyncHandler(controllerUnclock));
