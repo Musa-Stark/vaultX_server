@@ -9,4 +9,5 @@ export const envs = {
   PORT: process.env.PORT,
   ENV: process.env.ENV,
   MASTER_KEY: process.env.MASTER_KEY,
+  RESEND_APIKEY: process.env.RESEND_APIKEY,
 };

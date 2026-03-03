@@ -2,16 +2,25 @@ import { successResponse, AppError } from "../../utils/index.js";
 import { registerValidation } from "./auth.register.validation.js";
 import { loginValidation } from "./auth.login.validation.js";
 import {
+  serviceSendOTP,
   serviceRegister,
   serviceLogin,
   serviceUnlock,
 } from "./auth.service.js";
 
-export const controllerRegister = async (req, res) => {
+export const controllerSendOTP = async (req, res) => {
   const userData = await req.body;
 
   const error = registerValidation(userData);
   if (error) throw new AppError(error, 409);
+
+  await serviceSendOTP(userData);
+
+  successResponse(res, { message: "OTP sent" }, 200);
+};
+
+export const controllerRegister = async (req, res) => {
+  const userData = await req.body;
 
   const newUser = await serviceRegister(userData);
 
