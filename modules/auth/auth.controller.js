@@ -6,6 +6,7 @@ import {
   serviceForgotPasswordSendOTP,
   serviceForgotPasswordVerifyOTP,
   serviceNewPassword,
+  serviceNewMasterPassword,
   serviceRegister,
   serviceLogin,
   serviceUnlock,
@@ -61,6 +62,37 @@ export const controllerNewPassword = async (req, res) => {
   await serviceNewPassword(email, newPassword);
 
   successResponse(res, { message: "Password updated" }, 200);
+};
+
+// sending OTP when forgot master password
+export const controllerForgotMasterPasswordSendOTP = async (req, res) => {
+  const email = req.user.email;
+
+  await serviceForgotPasswordSendOTP(email);
+
+  successResponse(res, { email }, 200);
+};
+
+// verification OTP when master password forgot
+export const controllerForgotMasterPasswordVerifyOTP = async (req, res) => {
+  const { email, otp } = req.body;
+  if (!email || !otp) throw new AppError("Email and OTP are required", 409);
+
+  await serviceForgotPasswordVerifyOTP(email, otp);
+
+  successResponse(res, { message: "OTP verified" }, 200);
+};
+
+// updating, new master password when forgot password
+export const controllerNewMasterPassword = async (req, res) => {
+  const { email, newMasterPassword } = req.body;
+
+  if (!email || !newMasterPassword)
+    throw new AppError("Email and new master password are required", 409);
+
+  await serviceNewMasterPassword(email, newMasterPassword);
+
+  successResponse(res, { message: "Master password updated" }, 200);
 };
 
 // login

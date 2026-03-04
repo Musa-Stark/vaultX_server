@@ -99,6 +99,9 @@ export const serviceForgotPasswordSendOTP = async (email) => {
 export const serviceForgotPasswordVerifyOTP = async (email, otp) => {
   await connectDB();
 
+  const user = await User.findOne({ email });
+  if (!user) throw new AppError("User with this email not found", 409);
+
   const { otpHash, expiresAt, attempts } = await TempUser.findOne({ email });
 
   if (expiresAt < Date.now())
@@ -115,9 +118,47 @@ export const serviceNewPassword = async (email, newPassword) => {
   const user = await User.findOne({ email });
   if (!user) throw new AppError("User with this email not found", 409);
 
+  if (newPassword.length < 6)
+    throw new AppError("Password must be at least 6 characters", 409);
+
   newPassword = await hash(newPassword);
 
   await User.updateOne({ email: email }, { $set: { password: newPassword } });
+  await TempUser.deleteOne({ email: email });
+};
+
+// verfication when master password forgot
+export const serviceForgotMasterPasswordVerifyOTP = async (email, otp) => {
+  await connectDB();
+
+  const user = await User.findOne({ email });
+  if (!user) throw new AppError("User with this email not found", 409);
+
+  const { otpHash, expiresAt, attempts } = await TempUser.findOne({ email });
+
+  if (expiresAt < Date.now())
+    throw new AppError("OTP verification timed out!", 408);
+
+  const verifyOTP = await verify(otp, otpHash);
+  if (!verifyOTP) throw new AppError("Invalid OTP. Please try again", 409);
+};
+
+export const serviceNewMasterPassword = async (email, newMasterPassword) => {
+  await connectDB();
+
+  const user = await User.findOne({ email });
+  if (!user) throw new AppError("User with this email not found", 409);
+
+  if (newMasterPassword.length < 6)
+    throw new AppError("Master password must be at least 6 characters", 409);
+
+  newMasterPassword = await hash(newMasterPassword);
+
+  await User.updateOne(
+    { email: email },
+    { $set: { masterPassword: newMasterPassword } },
+  );
+  await TempUser.deleteOne({ email: email });
 };
 
 // login

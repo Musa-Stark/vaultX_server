@@ -6,7 +6,7 @@ export const loginValidation = (data) => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!regex.test(email)) return "Invalid email format";
 
-  if (password.length < 6) return "Invalid password";
+  if (password.length < 6) return "Password can't be less than 6 characters";
 
   return null;
 };
